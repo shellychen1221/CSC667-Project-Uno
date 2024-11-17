@@ -206,10 +206,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 deck.push({ color, value: card });
             }
         }
-        for (let i = 0; i < 4; i++) {
-            deck.push({ color: null, value: 'wild' });
-            deck.push({ color: null, value: 'wilddrawfour' });
-        }
+        
         shuffleDeck();
     }
 
@@ -274,12 +271,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             resetGame();
             return;
         }
-
         if (skipTurn) {
             currentPlayerIndex = getNextPlayerIndex();
             skipTurn = false;
         }
-
         currentPlayerIndex = getNextPlayerIndex();
         updateGameDisplay(username);
         saveGameState();
@@ -313,7 +308,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         const topCard = discardPile[discardPile.length - 1];
-        if (topCard && (card.color === topCard.color || card.value === topCard.value || card.value.includes('wild'))) {
+        if (topCard && (card.color === topCard.color || card.value === topCard.value)) {
             discardPile.push(card);
             player.hand = player.hand.filter(c => c !== card);
             handleSpecialCard(card);
@@ -352,13 +347,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             skipTurn = true;
         } else if (card.value === 'reverse') {
             direction *= -1;
-        } else if (card.value === 'wild' || card.value === 'wilddrawfour') {
-            showColorSelection(card);
-            if (card.value === 'wilddrawfour') {
-                // drawCard(players[getNextPlayerIndex()], 4);
-                skipTurn = true; // Set skipTurn to true so the next player loses their turn
-            }
-        }
+        } 
         endTurn();
     }
 
@@ -369,9 +358,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             btn.addEventListener('click', () => {
                 card.color = btn.id.replace('Btn', '');
                 colorSelection.style.display = 'none';
-                if (card.value === 'wilddrawfour') {
-                    drawCard(players[getNextPlayerIndex()], 4);
-                }
                 endTurn();
                 saveGameState();
             }, { once: true });
@@ -410,15 +396,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             const cardElement = document.createElement('div');
             cardElement.classList.add('card');
             
-            if (card.value === 'wilddrawfour') {
-                cardElement.textContent = 'WILD DRAW FOUR';
-                cardElement.style.backgroundColor = '#000';
-                cardElement.style.color = '#fff';
-                cardElement.style.fontSize = '16px';
-                cardElement.style.display = 'flex';
-                cardElement.style.alignItems = 'center';
-                cardElement.style.justifyContent = 'center';
-            } else if (player.name && player.name.includes(username)) {
+            if (player.name && player.name.includes(username)) {
                 cardElement.style.backgroundColor = card.color;
                 cardElement.textContent = card.value;
             } else {
@@ -439,19 +417,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (discardPile.length > 0) {
             const topCard = discardPile[discardPile.length - 1];
             const cardElement = document.createElement('div');
-            cardElement.classList.add('card');
-            if (topCard.value === 'wilddrawfour') {
-                cardElement.textContent = 'WILD DRAW FOUR';
-                cardElement.style.backgroundColor = '#000';
-                cardElement.style.color = '#fff';
-                cardElement.style.fontSize = '16px';
-                cardElement.style.display = 'flex';
-                cardElement.style.alignItems = 'center';
-                cardElement.style.justifyContent = 'center';
-            } else {
-                cardElement.style.backgroundColor = topCard.color;
-                cardElement.textContent = topCard.value;
-            }
+            cardElement.classList.add('card');    
+            cardElement.style.backgroundColor = topCard.color;
+            cardElement.textContent = topCard.value;
+            
             discardElement.appendChild(cardElement);
         }
     }

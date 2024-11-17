@@ -1,6 +1,5 @@
 const colors = ['red', 'green', 'blue', 'yellow'];
 const values = ['0','1','2','3','4','5','6','7','8','9','skip','reverse','drawtwo'];
-const specialCards = ['wild', 'wilddrawfour'];
 
 let deck = [];
 let discardPile = [];
@@ -16,12 +15,7 @@ function createDeck() {
         deck.push({ color, value });
       }
     }
-  }
-  for (let color of colors) {
-    for (let card of specialCards) {
-      deck.push({ color, value: card });
-      deck.push({ color, value: card });
-    }
+    deck.push({ color, value: '0' });
   }
 }
 
@@ -43,6 +37,10 @@ function drawCard(player, numCards = 1) {
 }
 
 function refillDeckFromDiscard() {
+  if (discardPile.length <= 1) {
+    alert('No more cards to draw. The game is a tie!');
+    return;
+  }
   const topCard = discardPile.pop();
   deck = discardPile.reverse();
   discardPile = [topCard];
@@ -81,7 +79,7 @@ function playCard(player, card) {
 
 function isValidMove(card) {
   const topCard = discardPile[discardPile.length - 1];
-  return card.color === topCard.color || card.value === topCard.value || card.color === 'any';
+  return card.color === topCard.color || card.value === topCard.value;
 }
 
 function applyCardEffects(card) {
@@ -90,36 +88,18 @@ function applyCardEffects(card) {
       currentPlayer = getNextPlayerIndex();
       break;
     case 'reverse':
-      direction *= -1;
+      if (players.length > 2) {
+        direction *= -1;
+      } else {
+        currentPlayer = getNextPlayerIndex();
+      }
       break;
     case 'drawtwo':
       const nextPlayer = getNextPlayer();
       drawCard(nextPlayer, 2);
       break;
-    case 'wild':
-      // Ask the current player to choose a color
-      chooseColor(card);
-      break;
-    case 'wilddrawfour':
-      const wildNextPlayer = getNextPlayer();
-      drawCard(wildNextPlayer, 4);
-      // Ask the current player to choose a color
-      chooseColor(card);
-      break;
     default:
       break;
-  }
-}
-
-function chooseColor(card) {
-  const colors = ['red', 'green', 'blue', 'yellow'];
-  const colorChoice = prompt('Choose a color: red, green, blue, or yellow');
-  if (colors.includes(colorChoice.toLowerCase())) {
-    card.color = colorChoice.toLowerCase();
-    switchPlayer();
-  } else {
-    alert('Invalid color choice. Please choose from red, green, blue, or yellow.');
-    chooseColor(card);
   }
 }
 
